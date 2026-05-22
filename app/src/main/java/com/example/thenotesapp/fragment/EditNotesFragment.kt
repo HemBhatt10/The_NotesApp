@@ -3,58 +3,99 @@ package com.example.thenotesapp.fragment
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
+import com.example.thenotesapp.MainActivity
 import com.example.thenotesapp.R
+import com.example.thenotesapp.databinding.FragmentEditNotesBinding
+import com.example.thenotesapp.model.Note
+import com.example.thenotesapp.viewmodel.NoteViewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class EditNotesFragment : Fragment(R.layout.fragment_edit_notes), MenuProvider{
 
-/**
- * A simple [Fragment] subclass.
- * Use the [EditNotesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class EditNotesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentEditNotesBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var notesViewModel: NoteViewModel
+    private lateinit var currentNote: Note
+    private val args: EditNotesFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_notes, container, false)
+    ): View {
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_notes, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment EditNotesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            EditNotesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        notesViewModel = (activity as MainActivity).noteViewModel
+        currentNote = args.note!!
+
+        binding.editNoteTitle.setText(currentNote.NoteTitle)
+        binding.editNoteDesc.setText(currentNote.NoteDescription)
+
+        binding.editNoteFab.setOnClickListener {
+            val noteTitle = binding.editNoteTitle.text.toString().trim()
+            val noteDescription = binding.editNoteDesc.text.toString().trim()
+
+            if (noteTitle.isNotEmpty()){
+                val note = Note(currentNote.id, noteTitle, noteDescription)
+                notesViewModel.updateNote(note)
+                view.findNavController().popBackStack()
+            } else {
+                Toast.makeText(context, "Please enter note title", Toast.LENGTH_SHORT).show()
             }
+        }
     }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menu.clear()
+        menuInflater.inflate(R.menu.editnote_menu, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
+            R.id.editMenu -> {
+                deleteNote()
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun deleteNote() {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("Delete Note")
+            setMessage("Do you want to delete this note?")
+            setPositiveButton("Delete") { _, _ ->
+                notesViewModel.deleteNote(currentNote)
+                Toast.makeText(context, "Note Deleted", Toast.LENGTH_SHORT).show()
+                view?.findNavController()?.popBackStack(R.id.homeFragment, false)
+            }
+            setNegativeButton("Cancel", null)
+        }.create().show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }

@@ -23,6 +23,19 @@
             android:textColor="@color/red"
             android:textSize="24sp" />
 
+        <ImageButton
+            android:id="@+id/saveNoteBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/pink_border"
+            android:padding="6dp"
+            android:src="@drawable/ic_done"
+            app:tint="@color/white"
+            android:contentDescription="Save Note" />
+
         <EditText
             android:id="@+id/addNoteTitle"
             android:layout_width="match_parent"

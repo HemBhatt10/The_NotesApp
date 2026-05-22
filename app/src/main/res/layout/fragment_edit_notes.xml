@@ -57,8 +57,8 @@
             android:layout_marginBottom="20dp"
             android:clickable="true"
             android:backgroundTint="@color/pink"
-            android:tintMode="@color/white"
-            android:src="@drawable/ic_done"
+            app:tint="@color/white"
+            app:srcCompat="@drawable/ic_done"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:contentDescription="editFab" />

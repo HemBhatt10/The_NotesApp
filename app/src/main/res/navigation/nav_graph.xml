@@ -15,7 +15,11 @@
             app:destination="@id/addNoteFragment" />
         <action
             android:id="@+id/action_homeFragment_to_editNoteFragment"
-            app:destination="@id/editNoteFragment" />
+            app:destination="@id/editNoteFragment">
+            <argument
+                android:name="note"
+                app:argType="com.example.thenotesapp.model.Note" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/addNoteFragment"
@@ -36,7 +40,7 @@
             app:destination="@id/homeFragment" />
         <argument
             android:name="note"
-            app:argType="com.example.notesroompractice.model.Note"
+            app:argType="com.example.thenotesapp.model.Note"
             app:nullable="true" />
     </fragment>
 </navigation>
