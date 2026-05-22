@@ -7,6 +7,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -58,12 +60,28 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
             adapter = noteAdapter
         }
 
+        noteAdapter.setOnNoteLongClickListener { note ->
+            deleteNoteDialog(note)
+        }
+
         activity?.let {
             notesViewModel.getAllNotes().observe(viewLifecycleOwner) { note ->
                 noteAdapter.differ.submitList(note)
                 updateUI(note)
             }
         }
+    }
+
+    private fun deleteNoteDialog(note: Note) {
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("Delete Note")
+            setMessage("Do you want to delete this note?")
+            setPositiveButton("Delete") { _, _ ->
+                notesViewModel.deleteNote(note)
+                Toast.makeText(context, "Note Deleted", Toast.LENGTH_SHORT).show()
+            }
+            setNegativeButton("Cancel", null)
+        }.create().show()
     }
 
     private fun updateUI(note: List<Note>?) {

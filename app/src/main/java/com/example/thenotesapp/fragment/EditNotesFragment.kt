@@ -72,7 +72,7 @@ class EditNotesFragment : Fragment(R.layout.fragment_edit_notes), MenuProvider{
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
-            R.id.editMenu -> {
+            R.id.deleteMenu -> {
                 deleteNote()
                 true
             }

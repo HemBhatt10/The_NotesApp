@@ -30,6 +30,12 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
     val differ = AsyncListDiffer(this, differCallback)
 
 
+    private var onNoteLongClickListener: ((Note) -> Unit)? = null
+
+    fun setOnNoteLongClickListener(listener: (Note) -> Unit) {
+        onNoteLongClickListener = listener
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         return NoteViewHolder(
             NoteLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -47,6 +53,11 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
         holder.itemView.setOnClickListener {
             val direction = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(currentNote)
             it.findNavController().navigate(direction)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            onNoteLongClickListener?.invoke(currentNote)
+            true
         }
     }
 }
